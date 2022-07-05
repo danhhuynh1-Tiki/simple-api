@@ -1,4 +1,4 @@
-package setup
+package app
 
 import (
 	_ "net/http"
@@ -12,6 +12,6 @@ func Run(){
 
 func SetupRoute() *gin.Engine{
 	app := gin.Default()
-	routes.StudentRoute(app)
+	routes.UserRoute(app)
 	return app
 }
