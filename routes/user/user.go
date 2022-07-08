@@ -31,10 +31,14 @@ func (u *UserHandler) AllUser(c *gin.Context) {
 	alluser := u.userUsecase.GetUser()
 	if alluser == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": "Fail",
 		})
 	}
-	c.JSON(http.StatusOK, alluser)
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data ":  alluser,
+	})
 }
 
 func (u *UserHandler) AddUser(c *gin.Context) {
@@ -44,11 +48,13 @@ func (u *UserHandler) AddUser(c *gin.Context) {
 	check := u.userUsecase.AddUser(name)
 
 	if check == true {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
 			"message": "Successfull",
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": "Fail",
 		})
 	}
@@ -62,11 +68,13 @@ func (u *UserHandler) UpdateUser(c *gin.Context) {
 	check := u.userUsecase.UpdateUser(id, name)
 
 	if check == true {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
 			"message": "Successful",
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": "Fail",
 		})
 	}
@@ -79,11 +87,13 @@ func (u *UserHandler) DeleteUser(c *gin.Context) {
 	check := u.userUsecase.DeleteUser(id)
 
 	if check == true {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
 			"message": "Successful",
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": "Fail",
 		})
 	}
@@ -96,9 +106,12 @@ func (u *UserHandler) FindUser(c *gin.Context) {
 
 	if check == false && us == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": "User not found",
 		})
 	} else {
-		c.JSON(http.StatusOK, us)
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK,
+			"data": us,
+		})
 	}
 }
