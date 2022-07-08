@@ -1,27 +1,34 @@
 package routes
 
 import (
-	repository "api/repository/user"
+	"api/domain"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoute(route *gin.Engine) {
+type UserHandler struct {
+	userUsecase domain.UserUsecase
+}
+
+func NewUserHandler(route *gin.Engine, u domain.UserUsecase) {
+	userHandler := &UserHandler{userUsecase: u}
 
 	// Simple Api : v1
 	v1 := route.Group("/v1")
 	{
-		v1.GET("/user", AllUser)
-		v1.GET("/add_user", AddUser)
-		v1.GET("/update_user", UpdateUser)
-		v1.GET("/delete_user", DeleteUser)
-		v1.GET("/find_user", FindUser)
+		v1.GET("/user", userHandler.AllUser)
+		v1.POST("/add_user", userHandler.AddUser)
+		v1.PUT("/update_user", userHandler.UpdateUser)
+		v1.DELETE("/delete_user", userHandler.DeleteUser)
+		v1.GET("/find_user", userHandler.FindUser)
 	}
 }
 
-func AllUser(c *gin.Context) {
-	alluser := repository.GetUser()
+func (u *UserHandler) AllUser(c *gin.Context) {
+	// client := db.ConnectDB()
+
+	alluser := u.userUsecase.GetUser()
 	if alluser == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Fail",
@@ -30,10 +37,11 @@ func AllUser(c *gin.Context) {
 	c.JSON(http.StatusOK, alluser)
 }
 
-func AddUser(c *gin.Context) {
+func (u *UserHandler) AddUser(c *gin.Context) {
 
 	name := c.Query("name")
-	check := repository.AddUser(name)
+
+	check := u.userUsecase.AddUser(name)
 
 	if check == true {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -47,11 +55,11 @@ func AddUser(c *gin.Context) {
 
 }
 
-func UpdateUser(c *gin.Context) {
+func (u *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Query("id")
 	name := c.Query("name")
 
-	check := repository.UpdateUser(id, name)
+	check := u.userUsecase.UpdateUser(id, name)
 
 	if check == true {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -65,10 +73,10 @@ func UpdateUser(c *gin.Context) {
 
 }
 
-func DeleteUser(c *gin.Context) {
+func (u *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Query("id")
 
-	check := repository.DeleteUser(id)
+	check := u.userUsecase.DeleteUser(id)
 
 	if check == true {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -81,14 +89,14 @@ func DeleteUser(c *gin.Context) {
 	}
 }
 
-func FindUser(c *gin.Context) {
+func (u *UserHandler) FindUser(c *gin.Context) {
 	id := c.Query("id")
 
-	us := repository.FindUser(id)
+	check, us := u.userUsecase.FindUser(id)
 
-	if us == nil {
+	if check == false && us == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "",
+			"message": "User not found",
 		})
 	} else {
 		c.JSON(http.StatusOK, us)

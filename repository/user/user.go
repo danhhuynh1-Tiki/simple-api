@@ -9,12 +9,18 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UserRepository struct {
+type mongoUserRepository struct {
+	client *mongo.Client
 }
 
-func GetUser() []domain.User {
+func NewMongoUserRepository(client *mongo.Client) domain.UserRepository {
+	return &mongoUserRepository{client}
+}
+
+func (c *mongoUserRepository) GetUser() []domain.User {
 	client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -42,7 +48,7 @@ func GetUser() []domain.User {
 		return alluser
 	}
 }
-func AddUser(name string) bool {
+func (c *mongoUserRepository) AddUser(name string) bool {
 	client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -64,7 +70,7 @@ func AddUser(name string) bool {
 	}
 }
 
-func UpdateUser(id string, name string) bool {
+func (c *mongoUserRepository) UpdateUser(id string, name string) bool {
 	client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -92,7 +98,7 @@ func UpdateUser(id string, name string) bool {
 	}
 }
 
-func DeleteUser(id string) bool {
+func (c *mongoUserRepository) DeleteUser(id string) bool {
 	client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -103,7 +109,7 @@ func DeleteUser(id string) bool {
 
 	defer client.Disconnect(ctx)
 
-	fmt.Println("delete id : ", id)
+	// fmt.Println("delete id context : ", c1.Value("id"))
 
 	new_id, _ := primitive.ObjectIDFromHex(id)
 
@@ -118,7 +124,7 @@ func DeleteUser(id string) bool {
 	}
 }
 
-func FindUser(id string) *domain.User {
+func (c *mongoUserRepository) FindUser(id string) *domain.User {
 	client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
