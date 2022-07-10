@@ -15,13 +15,16 @@ func NewUserHandler(route *gin.Engine, u domain.UserUsecase) {
 	userHandler := &UserHandler{userUsecase: u}
 
 	// Simple Api : v1
-	v1 := route.Group("/v1")
+	simple := route.Group("/myapi")
 	{
-		v1.GET("/user", userHandler.AllUser)
-		v1.POST("/add_user", userHandler.AddUser)
-		v1.PUT("/update_user", userHandler.UpdateUser)
-		v1.DELETE("/delete_user", userHandler.DeleteUser)
-		v1.GET("/find_user", userHandler.FindUser)
+		v1 := simple.Group("/v1")
+		{
+			v1.GET("/users", userHandler.AllUser)
+			v1.POST("/add_user", userHandler.AddUser)
+			v1.PUT("/update_user", userHandler.UpdateUser)
+			v1.DELETE("/delete_user", userHandler.DeleteUser)
+			v1.GET("/find_user/:id", userHandler.FindUser)
+		}
 	}
 }
 
@@ -100,7 +103,7 @@ func (u *UserHandler) DeleteUser(c *gin.Context) {
 }
 
 func (u *UserHandler) FindUser(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 
 	check, us := u.userUsecase.FindUser(id)
 
