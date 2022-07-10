@@ -2,7 +2,6 @@ package repository
 
 import (
 	"api/domain"
-	"api/repository"
 	"context"
 	"fmt"
 	"time"
@@ -13,25 +12,25 @@ import (
 )
 
 type mongoUserRepository struct {
-	client *mongo.Client
+	client *mongo.Collection
 }
 
-func NewMongoUserRepository(client *mongo.Client) domain.UserRepository {
+func NewMongoUserRepository(client *mongo.Collection) domain.UserRepository {
 	return &mongoUserRepository{client}
 }
 
 func (c *mongoUserRepository) GetUser() []domain.User {
-	client := repository.ConnectDB()
+	// client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	defer client.Disconnect(ctx)
+	// defer client.Disconnect(ctx)
 
-	example := client.Database("example")
+	// example := client.Database("example")
 
-	userc := example.Collection("user")
+	// userc := example.Collection("user")
 
-	cursor, err := userc.Find(ctx, bson.M{})
+	cursor, err := c.client.Find(ctx, bson.M{})
 
 	defer cursor.Close(ctx)
 
@@ -49,17 +48,17 @@ func (c *mongoUserRepository) GetUser() []domain.User {
 	}
 }
 func (c *mongoUserRepository) AddUser(name string) bool {
-	client := repository.ConnectDB()
+	// client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	defer client.Disconnect(ctx)
+	// defer client.Disconnect(ctx)
 
-	example := client.Database("example")
+	// example := client.Database("example")
 
-	userc := example.Collection("user")
+	// userc := example.Collection("user")
 
-	res, err := userc.InsertOne(ctx, bson.D{
+	res, err := c.client.InsertOne(ctx, bson.D{
 		{Key: "name", Value: name},
 	})
 	if err != nil {
@@ -71,19 +70,19 @@ func (c *mongoUserRepository) AddUser(name string) bool {
 }
 
 func (c *mongoUserRepository) UpdateUser(id string, name string) bool {
-	client := repository.ConnectDB()
+	// client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	defer client.Disconnect(ctx)
+	// defer client.Disconnect(ctx)
 
-	example := client.Database("example")
+	// example := client.Database("example")
 
-	user := example.Collection("user")
+	// user := example.Collection("user")
 
 	new_id, _ := primitive.ObjectIDFromHex(id)
 
-	res, err := user.UpdateOne(
+	res, err := c.client.UpdateOne(
 		ctx,
 		bson.M{"_id": new_id},
 		bson.D{
@@ -99,21 +98,21 @@ func (c *mongoUserRepository) UpdateUser(id string, name string) bool {
 }
 
 func (c *mongoUserRepository) DeleteUser(id string) bool {
-	client := repository.ConnectDB()
+	// client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	example := client.Database("example")
+	// example := client.Database("example")
 
-	user := example.Collection("user")
+	// user := example.Collection("user")
 
-	defer client.Disconnect(ctx)
+	// defer client.Disconnect(ctx)
 
 	// fmt.Println("delete id context : ", c1.Value("id"))
 
 	new_id, _ := primitive.ObjectIDFromHex(id)
 
-	res, err := user.DeleteOne(ctx, bson.M{"_id": new_id})
+	res, err := c.client.DeleteOne(ctx, bson.M{"_id": new_id})
 
 	fmt.Println("delete count : ", res.DeletedCount)
 
@@ -125,21 +124,21 @@ func (c *mongoUserRepository) DeleteUser(id string) bool {
 }
 
 func (c *mongoUserRepository) FindUser(id string) *domain.User {
-	client := repository.ConnectDB()
+	// client := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	example := client.Database("example")
+	// example := client.Database("example")
 
-	user := example.Collection("user")
+	// user := example.Collection("user")
 
-	defer client.Disconnect(ctx)
+	// defer client.Disconnect(ctx)
 
 	new_id, _ := primitive.ObjectIDFromHex(id)
 
 	var us domain.User
 
-	err := user.FindOne(ctx, bson.M{"_id": new_id}).Decode(&us)
+	err := c.client.FindOne(ctx, bson.M{"_id": new_id}).Decode(&us)
 	if err != nil {
 		return nil
 	} else {
