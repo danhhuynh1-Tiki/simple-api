@@ -8,16 +8,16 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func ConnectDB() *mongo.Collection {
+func ConnectDB() *mongo.Database {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
 	example := client.Database("example")
 
-	userc := example.Collection("user")
+	// userc := example.Collection("user")
 
 	if err != nil {
 		return nil
 	} else {
-		return userc
+		return example
 	}
 
 }

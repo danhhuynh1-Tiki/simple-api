@@ -18,9 +18,9 @@ func Run() {
 
 func SetupRoute() *gin.Engine {
 	app := gin.Default()
-	client := repository.ConnectDB()
+	DB := repository.ConnectDB()
 
-	userRepository := userRepo.NewMongoUserRepository(client)
+	userRepository := userRepo.NewMongoUserRepository(DB)
 	userUsecase := userUsercase.NewUserUsecase(userRepository)
 	userHandl.NewUserHandler(app, userUsecase)
 
