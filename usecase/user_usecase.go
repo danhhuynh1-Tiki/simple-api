@@ -19,8 +19,8 @@ func (u *userUsecase) FindUser(id string) (bool, *domain.User) {
 	}
 }
 
-func (u *userUsecase) AddUser(id string) bool {
-	c := u.userRepo.AddUser(id)
+func (u *userUsecase) AddUser(user domain.User) bool {
+	c := u.userRepo.AddUser(user)
 	return c
 }
 
@@ -29,8 +29,8 @@ func (u *userUsecase) DeleteUser(id string) bool {
 	return c
 }
 
-func (u *userUsecase) UpdateUser(id string, name string) bool {
-	c := u.userRepo.UpdateUser(id, name)
+func (u *userUsecase) UpdateUser(user domain.User, id string) bool {
+	c := u.userRepo.UpdateUser(user, id)
 	return c
 }
 

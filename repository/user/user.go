@@ -18,6 +18,9 @@ type mongoUserRepository struct {
 func NewMongoUserRepository(DB *mongo.Database) domain.UserRepository {
 	return &mongoUserRepository{DB}
 }
+func getCollection(DB *mongo.Database) *mongo.Collection {
+	return DB.Collection("user")
+}
 
 func (c *mongoUserRepository) GetUser() []domain.User {
 	// DB := repository.ConnectDB()
@@ -28,7 +31,7 @@ func (c *mongoUserRepository) GetUser() []domain.User {
 
 	// example := DB.Database("example")
 
-	userc := c.DB.Collection("user")
+	userc := getCollection(c.DB)
 
 	cursor, err := userc.Find(ctx, bson.M{})
 
@@ -47,7 +50,7 @@ func (c *mongoUserRepository) GetUser() []domain.User {
 		return alluser
 	}
 }
-func (c *mongoUserRepository) AddUser(name string) bool {
+func (c *mongoUserRepository) AddUser(user domain.User) bool {
 	// DB := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -56,10 +59,10 @@ func (c *mongoUserRepository) AddUser(name string) bool {
 
 	// example := DB.Database("example")
 
-	userc := c.DB.Collection("user")
+	userc := getCollection(c.DB)
 
 	res, err := userc.InsertOne(ctx, bson.D{
-		{Key: "name", Value: name},
+		{Key: "name", Value: user.Name},
 	})
 	if err != nil {
 		return false
@@ -69,7 +72,7 @@ func (c *mongoUserRepository) AddUser(name string) bool {
 	}
 }
 
-func (c *mongoUserRepository) UpdateUser(id string, name string) bool {
+func (c *mongoUserRepository) UpdateUser(user domain.User, id string) bool {
 	// DB := repository.ConnectDB()
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -77,20 +80,20 @@ func (c *mongoUserRepository) UpdateUser(id string, name string) bool {
 	// defer DB.Disconnect(ctx)
 
 	// example := DB.Database("example")
-
-	user := c.DB.Collection("user")
+	// fmt.Println(user.ID)
+	userc := getCollection(c.DB)
 
 	new_id, _ := primitive.ObjectIDFromHex(id)
 
-	res, err := user.UpdateOne(
+	res, err := userc.UpdateOne(
 		ctx,
 		bson.M{"_id": new_id},
 		bson.D{
-			{"$set", bson.D{{"name", name}}},
+			{"$set", bson.D{{"name", user.Name}}},
 		},
 	)
 	fmt.Println("udpate count : ", res.ModifiedCount)
-	if err != nil {
+	if err != nil && res.ModifiedCount == 0 {
 		return false
 	} else {
 		return true
@@ -104,7 +107,7 @@ func (c *mongoUserRepository) DeleteUser(id string) bool {
 
 	// example := DB.Database("example")
 
-	user := c.DB.Collection("user")
+	user := getCollection(c.DB)
 
 	// defer DB.Disconnect(ctx)
 
@@ -130,7 +133,7 @@ func (c *mongoUserRepository) FindUser(id string) *domain.User {
 
 	// example := DB.Database("example")
 
-	user := c.DB.Collection("user")
+	user := getCollection(c.DB)
 
 	// defer DB.Disconnect(ctx)
 

@@ -1,6 +1,8 @@
 package domain
 
 import (
+	// "api/domain"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -12,15 +14,15 @@ type User struct {
 type UserUsecase interface {
 	FindUser(id string) (bool, *User)
 	DeleteUser(id string) bool
-	UpdateUser(id string, name string) bool
-	AddUser(name string) bool
+	UpdateUser(user User, id string) bool
+	AddUser(user User) bool
 	GetUser() []User
 }
 
 type UserRepository interface {
-	UpdateUser(id string, name string) bool
+	UpdateUser(user User, id string) bool
 	DeleteUser(id string) bool
 	FindUser(id string) *User
-	AddUser(name string) bool
+	AddUser(user User) bool
 	GetUser() []User
 }

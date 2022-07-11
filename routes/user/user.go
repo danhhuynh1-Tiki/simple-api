@@ -20,10 +20,10 @@ func NewUserHandler(route *gin.Engine, u domain.UserUsecase) {
 		v1 := simple.Group("/v1")
 		{
 			v1.GET("/users", userHandler.AllUser)
-			v1.POST("/add_user", userHandler.AddUser)
-			v1.PUT("/update_user", userHandler.UpdateUser)
-			v1.DELETE("/delete_user", userHandler.DeleteUser)
-			v1.GET("/find_user/:id", userHandler.FindUser)
+			v1.POST("/users", userHandler.AddUser)
+			v1.PUT("/users/:id", userHandler.UpdateUser)
+			v1.DELETE("/users/:id", userHandler.DeleteUser)
+			v1.GET("/users/:id", userHandler.FindUser)
 		}
 	}
 }
@@ -46,9 +46,14 @@ func (u *UserHandler) AllUser(c *gin.Context) {
 
 func (u *UserHandler) AddUser(c *gin.Context) {
 
-	name := c.Query("name")
+	// name := c.Query("name")
 
-	check := u.userUsecase.AddUser(name)
+	user := domain.User{}
+
+	c.ShouldBindJSON(&user)
+	// fmt.Println(user.Name)
+
+	check := u.userUsecase.AddUser(user)
 
 	if check == true {
 		c.JSON(http.StatusOK, gin.H{
@@ -65,10 +70,15 @@ func (u *UserHandler) AddUser(c *gin.Context) {
 }
 
 func (u *UserHandler) UpdateUser(c *gin.Context) {
-	id := c.Query("id")
-	name := c.Query("name")
+	id := c.Param("id")
+	// name := c.Query("name")
+	user := domain.User{}
+	c.ShouldBindJSON(&user)
 
-	check := u.userUsecase.UpdateUser(id, name)
+	// fmt.Println(user.ID)
+	// fmt.Println(user.Name)
+
+	check := u.userUsecase.UpdateUser(user, id)
 
 	if check == true {
 		c.JSON(http.StatusOK, gin.H{
@@ -85,7 +95,7 @@ func (u *UserHandler) UpdateUser(c *gin.Context) {
 }
 
 func (u *UserHandler) DeleteUser(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 
 	check := u.userUsecase.DeleteUser(id)
 
